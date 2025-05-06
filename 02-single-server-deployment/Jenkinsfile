@@ -13,7 +13,7 @@ pipeline {
         //     }
         // }
 
-        stage('Setup') {
+        stage('Setup and Test') {
             agent {
                 docker {
                     image 'python:3.10-alpine'
@@ -24,14 +24,16 @@ pipeline {
                 python3 -m venv venv
                 . venv/bin/activate
                 pip install -r ./02-single-server-deployment/requirements.txt
+                pytest
                 ''' 
             }
         }
-        stage('Test') {
-            steps {    
-                sh "pytest"  
-            }
-        }
+        
+        // stage('Test') {
+        //     steps {    
+        //         sh "pytest"  
+        //     }
+        // }
 
         stage('Package code') {      
             steps {   
