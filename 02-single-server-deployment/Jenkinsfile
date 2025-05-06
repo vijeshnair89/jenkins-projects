@@ -5,6 +5,14 @@ pipeline {
         SERVER_IP = credentials('app-server-ip')
     }
     stages {
+
+        stage('Create virtualenv') {
+            steps {
+                sh "python3 -m venv venv"
+                sh "source venv/bin/activate"
+            }
+        }
+        
         stage('Setup') {
             steps {
                 sh "pip install -r requirements.txt"
