@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         SERVER_IP = credentials('app-server-ip')
+        username = "ubuntu"
+        dest_path= "/home/ubuntu/"
     }
     stages {
 
@@ -47,15 +49,14 @@ pipeline {
                 script {
                     sshagent(['app-server-ssh-access']) {
                         sh """
+                            scp -o StrictHostKeyChecking=no myapp.zip  ${username}@${SERVER_IP}:${dest_path}
                             ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} "
-                                sudo systemctl stop flaskapp.service
-                                rm -rf /home/ubuntu/app/*
-
-                                unzip -o /home/ubuntu/myapp.zip -d /home/ubuntu/app/
-                                source app/venv/bin/activate
-                                cd /home/ubuntu/app/
+                                rm -rf ${dest_path}/app/*
+                                unzip -o ${dest_path}/myapp.zip -d ${dest_path}/app/
+                                source ${dest_path}/app/venv/bin/activate
+                                cd ${dest_path}/app/
                                 pip install -r requirements.txt
-                                sudo systemctl start flaskapp.service
+                                sudo systemctl restart flaskapp.service
                             "
                         """
                     }
