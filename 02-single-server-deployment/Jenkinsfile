@@ -52,7 +52,7 @@ pipeline {
                     zip -r myapp.zip ./* -x '*.git*'
                     ls -lart
                     unzip -l myapp.zip
-                """
+                """ 
                 }
             }
         }
