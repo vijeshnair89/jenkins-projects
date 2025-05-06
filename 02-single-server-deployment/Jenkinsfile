@@ -24,12 +24,14 @@ pipeline {
             }
 
             steps {
-                sh """
-                python3 -m venv venv
-                . venv/bin/activate
-                pip install -r .${folder}/requirements.txt
-                pytest
-                """
+                dir("${WORKSPACE}${folder}") {
+                    sh """
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                    pytest
+                    """
+                }
             }
 
 
@@ -42,11 +44,14 @@ pipeline {
         // }
 
         stage('Package code') {      
-            steps {   
-                sh """
-                zip -r myapp.zip .${folder}/* -x '*.git*'
-                ls -lart
+            steps {  
+                dir("${WORKSPACE}${folder}") { 
+                    sh """
+                    zip -r myapp.zip ./* -x '*.git*'
+                    ls -lart
+                    unzip -l myapp.zip
                 """
+                }
             }
         }
 
@@ -55,7 +60,7 @@ pipeline {
                 script {
                     sshagent(['app-server-ssh-access']) {
                         sh """
-                            scp -o StrictHostKeyChecking=no myapp.zip  ${username}@${SERVER_IP}:${dest_path}
+                            scp -o StrictHostKeyChecking=no ${WORKSPACE}${folder}/myapp.zip  ${username}@${SERVER_IP}:${dest_path}
                             ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} "
                                 rm -rf ${dest_path}/app/*
                                 unzip -o ${dest_path}/myapp.zip -d ${dest_path}/app/
