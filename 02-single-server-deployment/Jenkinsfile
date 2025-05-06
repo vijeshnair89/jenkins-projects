@@ -21,6 +21,7 @@ pipeline {
                     image 'python:3.10-alpine'
                 }
             }
+            
             steps {
                 sh '''
                 python3 -m venv venv
@@ -29,6 +30,8 @@ pipeline {
                 pytest
                 ''' 
             }
+
+
         } 
         
         // stage('Test') {
@@ -56,7 +59,7 @@ pipeline {
                                 source ${dest_path}/app/venv/bin/activate
                                 cd ${dest_path}/app/
                                 pip install -r requirements.txt
-                                sudo systemctl restart flaskapp.service
+                                sudo systemctl restart app.service
                             "
                         """
                     }
