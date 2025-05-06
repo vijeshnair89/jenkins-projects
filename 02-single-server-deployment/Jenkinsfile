@@ -54,7 +54,7 @@ pipeline {
                     unzip -l myapp.zip
                 """ 
                 }
-            }
+            } 
         }
 
         stage('Deploy to App Server') {
