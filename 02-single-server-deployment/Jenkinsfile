@@ -27,7 +27,7 @@ pipeline {
                 pytest
                 ''' 
             }
-        }
+        } 
         
         // stage('Test') {
         //     steps {    
