@@ -45,7 +45,7 @@ pipeline {
         stage('Deploy to App Server') {
             steps {
                 script {
-                    sshagent(['app-server-private-key']) {
+                    sshagent(['app-server-ssh-access']) {
                         sh """
                             ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} "
                                 sudo systemctl stop flaskapp.service
