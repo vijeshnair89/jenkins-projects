@@ -9,13 +9,18 @@ pipeline {
         stage('Create virtualenv') {
             steps {
                 sh "python3 -m venv venv"
-                sh ". ./venv/bin/activate"
+                sh ". ./venv/bin/activate" 
             }
         }
 
         stage('Setup') {
+            agent {
+                docker {
+                    image 'python:3.10-alpine'
+                }
+            }
             steps {
-                sh "./venv/bin/pip install -r ./02-single-server-deployment/requirements.txt" 
+                sh "pip install -r ./02-single-server-deployment/requirements.txt" 
             }
         }
         stage('Test') {
