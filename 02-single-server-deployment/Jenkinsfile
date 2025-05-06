@@ -4,7 +4,7 @@ pipeline {
     environment {
         SERVER_IP = credentials('app-server-ip')
         username = "ubuntu"
-        dest_path= "/home/ubuntu/"
+        dest_path= "/home/ubuntu"
         folder = "/02-single-server-deployment"
     }
     stages {
