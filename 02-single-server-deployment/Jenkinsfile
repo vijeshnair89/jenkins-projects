@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        SERVER_IP = credentials('prod-server-ip')
+        SERVER_IP = credentials('app-server-ip')
     }
     stages {
         stage('Setup') {
@@ -23,25 +23,27 @@ pipeline {
             }
         }
 
-        stage('Deploy to Prod') {
-            steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'ssh-key', keyFileVariable: 'MY_SSH_KEY', usernameVariable: 'username')]) {
-                    sh '''
-                    scp -i $MY_SSH_KEY -o StrictHostKeyChecking=no myapp.zip  ${username}@${SERVER_IP}:/home/ec2-user/
-                    ssh -i $MY_SSH_KEY -o StrictHostKeyChecking=no ${username}@${SERVER_IP} << EOF
-                        unzip -o /home/ec2-user/myapp.zip -d /home/ec2-user/app/
-                        source app/venv/bin/activate
-                        cd /home/ec2-user/app/
-                        pip install -r requirements.txt
-                        sudo systemctl restart flaskapp.service
-EOF
-                    '''
-                }
+        stage('Deploy to App Server') {
+            when {
+                branch "feature"
             }
-        }
-       
-        
-       
+            steps {
+                script {
+                    sshagent(['app-server-private-key']) {
+                        sh """
+                            ssh -o StrictHostKeyChecking=no ubuntu@${SERVER_IP} "
+                                sudo systemctl stop flaskapp.service
+                                rm -rf /home/ubuntu/app/*
+                                unzip -o /home/ubuntu/myapp.zip -d /home/ubuntu/app/
+                                source app/venv/bin/activate
+                                cd /home/ubuntu/app/
+                                pip install -r requirements.txt
+                                sudo systemctl start flaskapp.service
+                            "
+                        """
+                    }
+                }
+            } 
         
     }
 }
