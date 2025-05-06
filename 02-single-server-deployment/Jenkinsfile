@@ -5,6 +5,7 @@ pipeline {
         SERVER_IP = credentials('app-server-ip')
         username = "ubuntu"
         dest_path= "/home/ubuntu/"
+        folder = "/02-single-server-deployment"
     }
     stages {
 
@@ -21,14 +22,14 @@ pipeline {
                     image 'python:3.10-alpine'
                 }
             }
-            
+
             steps {
-                sh '''
+                sh """
                 python3 -m venv venv
                 . venv/bin/activate
-                pip install -r ./02-single-server-deployment/requirements.txt
+                pip install -r .${folder}/requirements.txt
                 pytest
-                ''' 
+                """
             }
 
 
@@ -42,8 +43,10 @@ pipeline {
 
         stage('Package code') {      
             steps {   
-                sh "zip -r myapp.zip ./* -x '*.git*'"
-                sh "ls -lart"
+                sh """
+                zip -r myapp.zip .${folder}/* -x '*.git*'
+                ls -lart
+                """
             }
         }
 
